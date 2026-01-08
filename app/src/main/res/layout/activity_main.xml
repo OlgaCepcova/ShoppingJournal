@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#98FBCB">
 
     <TextView
         android:id="@+id/tvTitle"
@@ -29,12 +30,22 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
+        android:id="@+id/btnNewList"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Sākt jaunu sarakstu"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/btnAdd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
         android:id="@+id/btnSendApi"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Nosūtīt uz API"
         android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/btnAdd"
+        app:layout_constraintTop_toBottomOf="@id/btnNewList"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -58,28 +69,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
         app:layout_constraintTop_toBottomOf="@id/tvApiResponse"
-        app:layout_constraintBottom_toTopOf="@id/btnTakePhoto"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <Button
-        android:id="@+id/btnTakePhoto"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="UZŅEMT FOTO"
-        android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/lvItems"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <ImageView
-        android:id="@+id/imgLastPhoto"
-        android:layout_width="0dp"
-        android:layout_height="120dp"
-        android:scaleType="centerCrop"
-        android:contentDescription="Pēdējais foto"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/btnTakePhoto"
+        app:layout_constraintBottom_toTopOf="@id/tvTotal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
@@ -90,12 +80,36 @@
         android:text="Kopā: 0.00 €"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/lvItems"
+        app:layout_constraintBottom_toTopOf="@id/btnTakePhoto"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/btnTakePhoto"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="UZŅEMT FOTO"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTotal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <ImageView
+        android:id="@+id/imgLastPhoto"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        android:scaleType="centerInside"
+        android:contentDescription="Pēdējais foto"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="32dp"
-        app:layout_constraintTop_toBottomOf="@id/imgLastPhoto"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintTop_toBottomOf="@id/btnTakePhoto"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

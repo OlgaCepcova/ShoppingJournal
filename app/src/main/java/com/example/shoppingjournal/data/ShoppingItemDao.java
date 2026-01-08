@@ -17,6 +17,10 @@ public interface ShoppingItemDao {
 
     @Query("SELECT SUM(price) FROM shopping_items")
     Double getTotal();
+
+    @Query("DELETE FROM shopping_items")
+    void deleteAll();
+
 }
 
 

@@ -198,6 +198,22 @@ public class MainActivity extends AppCompatActivity {
             requestQueue.add(postRequest);
         });
 
+        Button btnNewList = findViewById(R.id.btnNewList);
+
+        btnNewList.setOnClickListener(v -> {
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Sākt jaunu sarakstu?")
+                    .setMessage("Visi esošie pirkumi tiks dzēsti.")
+                    .setPositiveButton("Jā", (dialog, which) -> {
+                        new Thread(() -> {
+                            dao.deleteAll();
+                            runOnUiThread(this::loadFromDb);
+                        }).start();
+                    })
+                    .setNegativeButton("Atcelt", null)
+                    .show();
+        });
+
 
         btnAdd.setOnClickListener(v -> addItemLauncher.launch(new Intent(this, AddItemActivity.class)));
 
