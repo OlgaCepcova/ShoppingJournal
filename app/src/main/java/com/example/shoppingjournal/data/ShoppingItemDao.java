@@ -12,13 +12,11 @@ public interface ShoppingItemDao {
     @Insert
     long insert(ShoppingItem item);
 
-    @Query("SELECT * FROM shopping_items ORDER BY createdAt DESC")
+    @Query("SELECT * FROM shopping_items ORDER BY id DESC")
     List<ShoppingItem> getAll();
 
     @Query("SELECT SUM(price) FROM shopping_items")
-    Double getTotalSum();
-
-    @Query("DELETE FROM shopping_items")
-    void deleteAll();
+    Double getTotal();
 }
+
 

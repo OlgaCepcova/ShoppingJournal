@@ -12,13 +12,10 @@ public class ShoppingItem {
     public String name;
     public double price;
 
-    // vēlāk pievienosim: public String photoPath;
-    public long createdAt;
-
-    public ShoppingItem(String name, double price, long createdAt) {
+    public ShoppingItem(String name, double price) {
         this.name = name;
         this.price = price;
-        this.createdAt = createdAt;
     }
 }
+
 
