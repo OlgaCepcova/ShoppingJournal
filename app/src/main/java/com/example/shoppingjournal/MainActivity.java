@@ -7,19 +7,34 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.widget.ImageView;
 
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.example.shoppingjournal.data.AppDatabase;
 import com.example.shoppingjournal.data.ShoppingItem;
 import com.example.shoppingjournal.data.ShoppingItemDao;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -27,7 +42,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 
 import java.util.HashMap;
-import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -41,6 +55,45 @@ public class MainActivity extends AppCompatActivity {
 
     private AppDatabase db;
     private ShoppingItemDao dao;
+
+    private Uri pendingPhotoUri = null;
+    private ImageView imgLastPhoto;
+
+    private final ActivityResultLauncher<String[]> permissionLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.RequestMultiplePermissions(),
+                    result -> {
+                        boolean allGranted = true;
+                        for (Boolean granted : result.values()) {
+                            if (!Boolean.TRUE.equals(granted)) { allGranted = false; break; }
+                        }
+                        if (allGranted) {
+                            startFullSizeCapture();
+                        } else {
+                            Toast.makeText(this, "Atļaujas noraidītas.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+            );
+
+    private final ActivityResultLauncher<Uri> takePictureLauncher =
+            registerForActivityResult(
+                    new ActivityResultContracts.TakePicture(),
+                    success -> {
+                        if (Boolean.TRUE.equals(success)) {
+                            Toast.makeText(this, "Foto saglabāts!", Toast.LENGTH_SHORT).show();
+                            // parādam bildi UI
+                            imgLastPhoto.setImageURI(pendingPhotoUri);
+                        } else {
+                            // ja atcelts, izdzēšam tukšo ierakstu (īpaši svarīgi API 29+)
+                            if (pendingPhotoUri != null) {
+                                getContentResolver().delete(pendingPhotoUri, null, null);
+                            }
+                            Toast.makeText(this, "Uzņemšana atcelta.", Toast.LENGTH_SHORT).show();
+                        }
+                        pendingPhotoUri = null;
+                    }
+            );
+
 
     private final ActivityResultLauncher<Intent> addItemLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -91,8 +144,15 @@ public class MainActivity extends AppCompatActivity {
         dao = db.shoppingItemDao();
 
         // --- API UI ---
-        TextView tvApiResponse = findViewById(R.id.tvApiResponse);
-        Button btnSendApi = findViewById(R.id.btnSendApi);
+        tvApiResponse = findViewById(R.id.tvApiResponse);
+        btnSendApi = findViewById(R.id.btnSendApi);
+
+        imgLastPhoto = findViewById(R.id.imgLastPhoto);
+        Button btnTakePhoto = findViewById(R.id.btnTakePhoto);
+
+        btnTakePhoto.setOnClickListener(v -> ensureCameraAndSave());
+
+
 
 // --- Volley queue ---
         com.android.volley.RequestQueue requestQueue =
@@ -165,6 +225,62 @@ public class MainActivity extends AppCompatActivity {
             });
         }).start();
     }
+
+    private boolean areAllGranted(String[] perms) {
+        for (String p : perms) {
+            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void ensureCameraAndSave() {
+        String[] required = com.example.shoppingjournal.PermissionHelper.forCameraAndSaveToGallery();
+        if (areAllGranted(required)) {
+            startFullSizeCapture();
+        } else {
+            permissionLauncher.launch(required);
+        }
+    }
+
+    private void startFullSizeCapture() {
+        pendingPhotoUri = createDestinationUri();
+        if (pendingPhotoUri == null) {
+            Toast.makeText(this, "Neizdevās izveidot vietu attēlam.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        takePictureLauncher.launch(pendingPhotoUri);
+    }
+
+    private Uri createDestinationUri() {
+        String time = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        String fileName = "IMG_" + time + ".jpg";
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Android 10+ (API 29+) - saglabājas galerijā caur MediaStore
+            ContentResolver resolver = getContentResolver();
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            values.put(MediaStore.Images.Media.RELATIVE_PATH,
+                    Environment.DIRECTORY_PICTURES + File.separator + "ShoppingJournal");
+            values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+
+            return resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        } else {
+            // Android 9 un zemāk (API <= 28) - fails Pictures/ShoppingJournal + FileProvider
+            File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            File appDir = new File(picturesDir, "ShoppingJournal");
+            if (!appDir.exists() && !appDir.mkdirs()) return null;
+
+            File file = new File(appDir, fileName);
+            return FileProvider.getUriForFile(this,
+                    getPackageName() + ".fileprovider",
+                    file);
+        }
+    }
+
 }
 
 
