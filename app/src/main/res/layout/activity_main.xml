@@ -60,7 +60,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- SARAKSTS AIZŅEM VISU VIDUS ZONU -->
     <ListView
         android:id="@+id/lvItems"
         android:layout_width="0dp"

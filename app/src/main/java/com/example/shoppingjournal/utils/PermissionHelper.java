@@ -12,7 +12,6 @@ public class PermissionHelper {
         List<String> perms = new ArrayList<>();
         perms.add(Manifest.permission.CAMERA);
 
-        // API 28 un zemāk vajag WRITE_EXTERNAL_STORAGE
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
             perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }

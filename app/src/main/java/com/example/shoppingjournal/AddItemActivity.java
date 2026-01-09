@@ -5,8 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.example.shoppingjournal.data.AppDatabase;
-import com.example.shoppingjournal.data.ShoppingItem;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 

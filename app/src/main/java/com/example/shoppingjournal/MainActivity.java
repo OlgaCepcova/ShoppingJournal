@@ -1,21 +1,20 @@
 package com.example.shoppingjournal;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
-
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,21 +26,12 @@ import com.example.shoppingjournal.data.AppDatabase;
 import com.example.shoppingjournal.data.ShoppingItem;
 import com.example.shoppingjournal.data.ShoppingItemDao;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Map;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-
-import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,10 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private Button btnSendApi;
     private ArrayAdapter<String> adapter;
     private final ArrayList<String> uiItems = new ArrayList<>();
-
     private AppDatabase db;
     private ShoppingItemDao dao;
-
     private Uri pendingPhotoUri = null;
     private ImageView imgLastPhoto;
 
@@ -81,10 +69,8 @@ public class MainActivity extends AppCompatActivity {
                     success -> {
                         if (Boolean.TRUE.equals(success)) {
                             Toast.makeText(this, "Foto saglabāts!", Toast.LENGTH_SHORT).show();
-                            // parādam bildi UI
                             imgLastPhoto.setImageURI(pendingPhotoUri);
                         } else {
-                            // ja atcelts, izdzēšam tukšo ierakstu (īpaši svarīgi API 29+)
                             if (pendingPhotoUri != null) {
                                 getContentResolver().delete(pendingPhotoUri, null, null);
                             }
@@ -93,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                         pendingPhotoUri = null;
                     }
             );
-
 
     private final ActivityResultLauncher<Intent> addItemLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -109,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     String cleanPrice = priceStr.trim().replace(",", ".");
 
                     if (cleanName.isEmpty() || cleanPrice.isEmpty()) {
-                        return; // AddItemActivity jau vajadzētu validēt, bet drošībai
+                        return;
                     }
 
                     double price;
@@ -151,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
         Button btnTakePhoto = findViewById(R.id.btnTakePhoto);
 
         btnTakePhoto.setOnClickListener(v -> ensureCameraAndSave());
-
 
 
 // --- Volley queue ---
@@ -213,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
                     .setNegativeButton("Atcelt", null)
                     .show();
         });
-
 
         btnAdd.setOnClickListener(v -> addItemLauncher.launch(new Intent(this, AddItemActivity.class)));
 
